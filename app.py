@@ -4,236 +4,298 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-# =====================================================
+# ======================================================
 # 건강나이 연구소
-# 외부 데이터 파일 없이 실행되는 버전
-# =====================================================
+# 밝고 생동감 있는 병원·건강검진센터 스타일
+# 외부 데이터 파일 없이 실행 가능
+# ======================================================
 
 st.set_page_config(
     page_title="건강나이 연구소",
-    page_icon="🌿",
+    page_icon="🏥",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# -----------------------------------------------------
-# 1. 디자인
-# -----------------------------------------------------
+# ------------------------------------------------------
+# 1. 화면 디자인
+# ------------------------------------------------------
 
 st.markdown("""
 <style>
+/* 전체 배경 */
 .stApp {
-    background-color: #F5F7F3;
-    color: #34483D;
-    font-family: "Malgun Gothic", sans-serif;
+    background:
+        radial-gradient(ellipse at 5% 5%,
+            rgba(87, 194, 211, 0.17), transparent 28%),
+        radial-gradient(ellipse at 95% 20%,
+            rgba(106, 170, 239, 0.15), transparent 27%),
+        linear-gradient(180deg, #F1F8FF 0%, #F8FBFF 48%, #F2F8FC 100%);
+    color: #243B53;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
 }
 
 .block-container {
-    max-width: 1180px;
-    padding-top: 2rem;
+    max-width: 1200px;
+    padding-top: 1.8rem;
     padding-bottom: 3rem;
 }
 
+/* 제목 */
 h1, h2, h3 {
-    color: #285C4D !important;
-    letter-spacing: -0.6px;
+    color: #174C78 !important;
+    letter-spacing: -0.7px;
 }
 
 h1 {
+    font-weight: 800 !important;
+}
+
+h2, h3 {
     font-weight: 750 !important;
 }
 
+/* 본문 */
 p, label, .stMarkdown {
-    color: #465B50;
+    color: #40566D;
 }
 
-div[data-testid="stMetric"] {
-    background: white;
-    border: 1px solid #E1E9E1;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 3px 12px rgba(42, 75, 57, 0.05);
-}
-
-div[data-testid="stMetricLabel"] {
-    color: #63796C !important;
-}
-
-div[data-testid="stMetricValue"] {
-    color: #285C4D !important;
-    font-weight: 750;
-}
-
+/* 사이드바 */
 section[data-testid="stSidebar"] {
-    background-color: #EAF1EB;
-    border-right: 1px solid #DCE6DC;
+    background: linear-gradient(180deg, #E3F3FF, #F1F8FF);
+    border-right: 1px solid #D2E6F5;
 }
 
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 {
-    color: #285C4D !important;
+    color: #174C78 !important;
 }
 
-.stButton > button,
-.stFormSubmitButton > button {
-    background-color: #397765;
-    color: white;
-    border: 1px solid #397765;
-    border-radius: 10px;
-    padding: 0.6rem 1.2rem;
-    font-weight: 650;
+/* 첫 화면 메인 배너 */
+.hero {
+    background: linear-gradient(115deg, #1769AA 0%, #248DC5 58%, #54BCD0 100%);
+    border-radius: 24px;
+    padding: 34px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 28px rgba(33, 111, 167, 0.17);
+    position: relative;
 }
 
-.stButton > button:hover,
-.stFormSubmitButton > button:hover {
-    background-color: #2D6253;
-    color: white;
-    border-color: #2D6253;
+.hero-kicker {
+    color: #DDF6FF;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+}
+
+.hero-title {
+    color: #FFFFFF;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.45;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+}
+
+.hero-description {
+    color: #F1FBFF;
+    font-size: 15px;
+    line-height: 1.9;
+}
+
+.hero-tag {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 7px 12px;
+    background: rgba(255, 255, 255, 0.18);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* 안내 배너 */
+.info-note {
+    background: #FFF8E8;
+    border: 1px solid #F5DDA0;
+    border-left: 5px solid #F0B743;
+    border-radius: 12px;
+    padding: 15px 18px;
+    margin: 12px 0 24px 0;
+    color: #75561B;
+    line-height: 1.75;
+}
+
+/* 섹션 카드 */
+.section-box {
+    background: #FFFFFF;
+    border: 1px solid #DCEAF5;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(48, 99, 143, 0.045);
+}
+
+/* 지표 카드 */
+div[data-testid="stMetric"] {
+    background: #FFFFFF;
+    border: 1px solid #DCEAF5;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 15px rgba(48, 99, 143, 0.06);
+}
+
+div[data-testid="stMetricLabel"] {
+    color: #607D98 !important;
+    font-size: 0.92rem;
+}
+
+div[data-testid="stMetricValue"] {
+    color: #1769AA !important;
+    font-weight: 800;
+}
+
+/* 입력 영역 */
+div[data-testid="stForm"] {
+    background: #FFFFFF;
+    border: 1px solid #DCEAF5;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 4px 16px rgba(48, 99, 143, 0.045);
 }
 
 .stTextInput input,
 .stNumberInput input {
     border-radius: 10px;
-    background-color: white;
+    background: #FFFFFF;
 }
 
 .stSelectbox div[data-baseweb="select"] {
     border-radius: 10px;
 }
 
-.hero {
-    background: linear-gradient(120deg, #E4EFE7, #F9F8F2);
-    border: 1px solid #DCE7DC;
-    border-radius: 20px;
-    padding: 30px;
-    margin-bottom: 24px;
-}
-
-.hero-kicker {
-    color: #53816D;
-    font-size: 12px;
+/* 버튼 */
+.stButton > button,
+.stFormSubmitButton > button {
+    background: linear-gradient(100deg, #1769AA, #238FC2);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 11px;
+    padding: 0.65rem 1.1rem;
     font-weight: 750;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
+    transition: 0.2s;
 }
 
-.hero-title {
-    color: #285C4D;
-    font-size: 30px;
-    font-weight: 750;
-    line-height: 1.5;
-    margin-bottom: 10px;
+.stButton > button:hover,
+.stFormSubmitButton > button:hover {
+    background: #12588F;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(23, 105, 170, 0.2);
 }
 
-.hero-description {
-    color: #536B5E;
-    font-size: 15px;
-    line-height: 1.8;
+/* 표 */
+div[data-testid="stDataFrame"],
+div[data-testid="stTable"] {
+    background: #FFFFFF;
+    border: 1px solid #DCEAF5;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-.info-note {
-    background: #EDF4EE;
-    border-left: 4px solid #79A88E;
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin: 12px 0 22px 0;
-    color: #405D4D;
-    line-height: 1.7;
-}
-
-.section-card {
-    background: white;
-    border: 1px solid #E1E9E1;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 15px;
-}
-
+/* 구분선 */
 hr {
-    border-color: #DCE6DC;
+    border-color: #D6E6F2;
 }
 
+/* 반응형 */
 @media (max-width: 768px) {
     .block-container {
         padding: 1rem;
     }
 
     .hero {
-        padding: 22px;
+        padding: 23px;
     }
 
     .hero-title {
-        font-size: 24px;
+        font-size: 25px;
     }
 }
 </style>
 """, unsafe_allow_html=True)
 
 
-# -----------------------------------------------------
-# 2. 건강 지표 설정
-# -----------------------------------------------------
+# ------------------------------------------------------
+# 2. 지표 설정
+# ------------------------------------------------------
 
 VARIABLES = {
     "수축기 혈압": {
         "unit": "mmHg",
-        "description": "심장이 수축할 때 혈관에 가해지는 압력입니다."
+        "description": "심장이 수축할 때 혈관에 가해지는 압력입니다.",
+        "direction": "높은 수치만으로 건강 상태를 판정할 수 없습니다."
     },
     "이완기 혈압": {
         "unit": "mmHg",
-        "description": "심장이 이완할 때 혈관에 가해지는 압력입니다."
+        "description": "심장이 이완할 때 혈관에 가해지는 압력입니다.",
+        "direction": "높은 수치만으로 건강 상태를 판정할 수 없습니다."
     },
     "공복 혈당": {
         "unit": "mg/dL",
-        "description": "공복 상태에서 측정한 혈액 속 포도당 농도입니다."
+        "description": "공복 상태에서 측정한 혈액 속 포도당 농도입니다.",
+        "direction": "높은 수치는 추가적인 건강 평가가 필요할 수 있습니다."
     },
     "HDL 콜레스테롤": {
         "unit": "mg/dL",
-        "description": "혈중 지질 상태를 평가할 때 활용하는 지표입니다."
+        "description": "혈중 지질 상태를 평가할 때 활용하는 지표입니다.",
+        "direction": "다른 지표와 달리 높은 HDL은 일반적으로 유리한 방향일 수 있습니다."
     },
     "중성지방": {
         "unit": "mg/dL",
-        "description": "혈액 속 지방의 한 종류입니다."
+        "description": "혈액 속 지방의 한 종류입니다.",
+        "direction": "높은 수치는 추가적인 건강 평가가 필요할 수 있습니다."
     },
     "허리둘레": {
         "unit": "cm",
-        "description": "복부 비만 관련 지표 중 하나입니다."
+        "description": "복부 비만 관련 지표 중 하나입니다.",
+        "direction": "해석에는 성별, 연령 등 여러 요인을 고려해야 합니다."
     }
 }
 
 
-# -----------------------------------------------------
-# 3. 시뮬레이션 참고 데이터 생성
-# -----------------------------------------------------
+# ------------------------------------------------------
+# 3. 가상 참고 데이터 만들기
+# ------------------------------------------------------
 
 @st.cache_data
 def create_demo_data():
     """
-    화면 실행과 기능 시험을 위한 가상 데이터입니다.
-    실제 국민건강영양조사 자료가 아닙니다.
+    앱 기능을 시연하기 위한 가상 데이터입니다.
+    실제 조사 자료나 실제 인구의 통계가 아닙니다.
     """
 
     rng = np.random.default_rng(42)
-    n = 5000
+    n = 6000
 
     age = rng.integers(18, 81, size=n)
     sex = rng.choice(["여", "남"], size=n)
 
-    # 나이와 개인별 차이를 단순하게 반영한 예시값
-    systolic_bp = (
+    systolic = (
         105 + age * 0.35
         + np.where(sex == "남", 3, 0)
         + rng.normal(0, 12, n)
     )
 
-    diastolic_bp = (
+    diastolic = (
         66 + age * 0.10
         + np.where(sex == "남", 2, 0)
         + rng.normal(0, 8, n)
     )
 
-    fasting_glucose = (
+    glucose = (
         82 + age * 0.16
         + rng.normal(0, 12, n)
     )
@@ -251,126 +313,153 @@ def create_demo_data():
         size=n
     )
 
-    waist_cm = (
+    waist = (
         68 + age * 0.12
         + np.where(sex == "남", 12, 0)
         + rng.normal(0, 9, n)
     )
 
-    df = pd.DataFrame({
+    return pd.DataFrame({
         "age": age,
         "sex": sex,
-        "수축기 혈압": np.clip(systolic_bp, 75, 240),
-        "이완기 혈압": np.clip(diastolic_bp, 40, 150),
-        "공복 혈당": np.clip(fasting_glucose, 55, 250),
+        "수축기 혈압": np.clip(systolic, 75, 240),
+        "이완기 혈압": np.clip(diastolic, 40, 150),
+        "공복 혈당": np.clip(glucose, 55, 250),
         "HDL 콜레스테롤": np.clip(hdl, 15, 130),
         "중성지방": np.clip(triglycerides, 25, 900),
-        "허리둘레": np.clip(waist_cm, 45, 160)
+        "허리둘레": np.clip(waist, 45, 160)
     })
-
-    return df
 
 
 reference_data = create_demo_data()
 
 
-# -----------------------------------------------------
-# 4. 백분위 계산 함수
-# -----------------------------------------------------
+# ------------------------------------------------------
+# 4. 백분위와 분류 계산
+# ------------------------------------------------------
 
 def calculate_percentile(values, user_value):
     """
-    참고 데이터에서 입력값 이하에 해당하는 비율을 계산합니다.
-    시뮬레이션 데이터용 단순 백분위입니다.
+    입력값 이하인 참고 데이터의 비율을 계산합니다.
     """
 
     values = pd.Series(values).dropna()
 
-    if len(values) == 0:
+    if values.empty:
         return None
 
     return float((values <= user_value).mean() * 100)
 
 
-def get_percentile_text(percentile):
+def classify_percentile(percentile):
+    """
+    수치의 상대적 위치를 세 구간으로 분류합니다.
+    이 분류는 건강 상태의 순위가 아닙니다.
+    """
+
     if percentile is None:
-        return "계산할 수 없습니다."
+        return "계산 불가"
 
     if percentile < 25:
-        return "참고 집단의 하위 25% 범위"
-    elif percentile < 50:
-        return "참고 집단의 25~50% 범위"
-    elif percentile < 75:
-        return "참고 집단의 50~75% 범위"
-    else:
-        return "참고 집단의 상위 25% 범위"
+        return "하위권"
+
+    if percentile < 75:
+        return "중위권"
+
+    return "상위권"
 
 
-# -----------------------------------------------------
+def percentile_explanation(percentile):
+    if percentile is None:
+        return "비교할 데이터가 부족합니다."
+
+    if percentile < 25:
+        return (
+            "참고 집단의 하위 25% 범위에 해당하는 수치입니다."
+        )
+
+    if percentile < 75:
+        return (
+            "참고 집단의 가운데 50% 범위에 해당하는 수치입니다."
+        )
+
+    return (
+        "참고 집단의 상위 25% 범위에 해당하는 수치입니다."
+)
+
+
+# ------------------------------------------------------
 # 5. 사이드바
-# -----------------------------------------------------
+# ------------------------------------------------------
 
 with st.sidebar:
-    st.markdown("# 🌿 건강나이 연구소")
-    st.caption("나의 건강을 이해하는 공간")
+    st.markdown("# 🏥 건강나이 연구소")
+    st.caption("HEALTH CHECK · WELLNESS")
 
     st.divider()
 
-    st.markdown("### 이용 방법")
-    st.write("**01** 기본 정보를 입력합니다.")
-    st.write("**02** 건강검진 수치를 입력합니다.")
-    st.write("**03** 비슷한 연령대와 비교합니다.")
+    st.markdown("### 이용 순서")
+    st.write("🔹 **01** 기본 정보 입력")
+    st.write("🔹 **02** 건강검진 수치 입력")
+    st.write("🔹 **03** 상대적 위치 확인")
 
     st.divider()
 
-    st.markdown("### 데이터 안내")
-    st.write(
-        "현재는 프로그램 작동을 확인하기 위한 "
-        "가상 데이터를 사용합니다."
+    st.markdown("### 현재 데이터")
+    st.info(
+        "현재 체험 화면은 가상 데이터를 사용합니다. "
+        "실제 인구 집단의 건강 통계가 아닙니다."
     )
 
     st.caption(
-        "비교 결과는 실제 인구 통계나 의학적 진단이 아닙니다."
+        "의료 진단이나 치료 결정을 위한 서비스가 아닙니다."
     )
 
 
-# -----------------------------------------------------
-# 6. 첫 화면
-# -----------------------------------------------------
+# ------------------------------------------------------
+# 6. 첫 화면 배너
+# ------------------------------------------------------
 
 st.markdown("""
 <div class="hero">
     <div class="hero-kicker">
-        PERSONAL HEALTH INFORMATION
+        HEALTH CHECK · PERSONAL WELLNESS
     </div>
 
     <div class="hero-title">
-        나의 건강을 이해하는 첫걸음
+        내 건강 상태를 한눈에 확인하세요
     </div>
 
     <div class="hero-description">
-        건강 지표를 입력하고 비슷한 연령대의 가상 참고 데이터와 비교해 보세요.<br>
-        나의 건강 상태를 이해하는 데 도움이 되는 정보를 확인할 수 있습니다.
+        건강검진 수치를 입력하고, 비슷한 연령대의 가상 참고 집단과 비교해 보세요.<br>
+        각 지표의 상대적 위치와 의미를 알아볼 수 있습니다.
+    </div>
+
+    <div class="hero-tag">
+        ✦ 나의 건강 지표 살펴보기
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("""
 <div class="info-note">
-    <b>현재 체험 모드입니다.</b><br>
-    실제 건강 조사 자료가 아닌 가상 데이터로 결과를 계산합니다.
-    따라서 실제 또래 집단의 건강 상태를 나타내지 않으며,
-    질병이나 생물학적 나이를 판정하는 데 사용할 수 없습니다.
+    <b>📌 체험용 데이터 안내</b><br>
+    현재 비교에는 프로그램이 생성한 가상 데이터가 사용됩니다.
+    결과는 실제 또래 집단의 통계가 아니며, 건강 상태의 순위나
+    생물학적 나이를 판정하는 데 사용할 수 없습니다.
 </div>
 """, unsafe_allow_html=True)
 
 
-# -----------------------------------------------------
-# 7. 기본 정보 입력
-# -----------------------------------------------------
+# ------------------------------------------------------
+# 7. 사용자 입력
+# ------------------------------------------------------
 
-st.markdown("## 1. 기본 정보 입력")
-st.caption("나이와 성별을 선택한 뒤 비교할 건강검진 수치를 입력하세요.")
+st.markdown("## 🩺 1. 기본 정보와 건강검진 수치")
+st.caption(
+    "최근 건강검진 결과가 있다면 해당 수치를 입력하세요. "
+    "모르는 항목은 비워 둘 수 있습니다."
+)
 
 with st.form("health_form"):
 
@@ -397,11 +486,11 @@ with st.form("health_form"):
         horizontal=True
     )
 
-    st.markdown("### 건강검진 수치")
+    st.markdown("### 건강검진 결과 입력")
 
-    col1, col2, col3 = st.columns(3)
+    c1, c2, c3 = st.columns(3)
 
-    with col1:
+    with c1:
         systolic_bp = st.number_input(
             "수축기 혈압 (mmHg)",
             min_value=0.0,
@@ -418,7 +507,7 @@ with st.form("health_form"):
             placeholder="예: 75"
         )
 
-    with col2:
+    with c2:
         fasting_glucose = st.number_input(
             "공복 혈당 (mg/dL)",
             min_value=0.0,
@@ -435,7 +524,7 @@ with st.form("health_form"):
             placeholder="예: 55"
         )
 
-    with col3:
+    with c3:
         triglycerides = st.number_input(
             "중성지방 (mg/dL)",
             min_value=0.0,
@@ -453,14 +542,14 @@ with st.form("health_form"):
         )
 
     submitted = st.form_submit_button(
-        "건강 지표 비교하기",
+        "🔎 건강 지표 비교하기",
         use_container_width=True
     )
 
 
-# -----------------------------------------------------
-# 8. 결과 계산
-# -----------------------------------------------------
+# ------------------------------------------------------
+# 8. 결과 계산 및 표시
+# ------------------------------------------------------
 
 if submitted:
 
@@ -480,10 +569,12 @@ if submitted:
     }
 
     if not entered_values:
-        st.warning("비교할 건강 지표를 하나 이상 입력해 주세요.")
+        st.warning(
+            "비교할 건강 지표를 하나 이상 입력해 주세요."
+        )
         st.stop()
 
-    # 연령대 설정
+    # 비교 연령대 계산
     if age_range == "같은 10세 연령대":
         age_min = (int(age) // 10) * 10
         age_max = age_min + 9
@@ -491,30 +582,23 @@ if submitted:
         age_min = max(18, int(age) - 5)
         age_max = min(80, int(age) + 5)
 
-    # 같은 성별 및 연령대의 참고 데이터 선택
     comparison = reference_data[
         (reference_data["age"] >= age_min)
         & (reference_data["age"] <= age_max)
         & (reference_data["sex"] == sex)
     ]
 
-    st.markdown("## 2. 건강 지표 비교 결과")
+    st.markdown("## 📊 2. 나의 비교 결과")
 
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("입력한 나이", f"{age}세")
-    col2.metric(
-        "비교 연령대",
-        f"{age_min}~{age_max}세"
-    )
-    col3.metric(
-        "가상 참고 데이터",
-        f"{len(comparison):,}명"
-    )
+    col1.metric("입력 나이", f"{int(age)}세")
+    col2.metric("비교 연령대", f"{age_min}~{age_max}세")
+    col3.metric("가상 참고 데이터", f"{len(comparison):,}명")
 
     st.caption(
-        "참고 데이터 수는 실제 조사 참여자 수가 아니라 "
-        "프로그램에서 생성한 가상 데이터의 수입니다."
+        "참고 데이터 수는 가상 데이터의 행 수이며, "
+        "실제 조사 참여자 수가 아닙니다."
     )
 
     result_rows = []
@@ -523,9 +607,9 @@ if submitted:
     for name, user_value in entered_values.items():
 
         unit = VARIABLES[name]["unit"]
-        values = comparison[name]
+        values = comparison[name].dropna()
 
-        if values.dropna().empty:
+        if values.empty:
             continue
 
         median = values.median()
@@ -535,20 +619,23 @@ if submitted:
             user_value
         )
 
+        category = classify_percentile(percentile)
+
         result_rows.append({
             "건강 지표": name,
-            "입력값": f"{user_value:g} {unit}",
-            "가상 참고 집단 중앙값": f"{median:.1f} {unit}",
-            "백분위 위치": f"{percentile:.1f}%",
-            "참고 위치": get_percentile_text(percentile)
+            "내 입력값": f"{user_value:g} {unit}",
+            "가상 집단 중앙값": f"{median:.1f} {unit}",
+            "수치 백분위": f"{percentile:.1f}%",
+            "수치 상대 위치": category
         })
 
         chart_rows.append({
             "건강 지표": name,
-            "백분위 위치": percentile
+            "백분위": percentile,
+            "분류": category
         })
 
-    # 결과 표
+    # 결과 요약 표
     result_df = pd.DataFrame(result_rows)
 
     st.dataframe(
@@ -557,48 +644,140 @@ if submitted:
         hide_index=True
     )
 
-    # -------------------------------------------------
-    # 9. 그래프
-    # -------------------------------------------------
+    # --------------------------------------------------
+    # 9. 상위권 / 중위권 / 하위권 기준 안내
+    # --------------------------------------------------
+
+    st.markdown("### 🧭 상대적 위치는 어떻게 나뉠까요?")
+
+    rank1, rank2, rank3 = st.columns(3)
+
+    with rank1:
+        st.markdown("""
+        <div style="
+            background:#E9F3FF;
+            border:1px solid #B9D8FA;
+            border-radius:15px;
+            padding:18px;
+            min-height:145px;
+        ">
+            <div style="font-size:13px;color:#3A6FA5;font-weight:700;">
+                LOWER 25%
+            </div>
+            <div style="font-size:23px;color:#205E9C;font-weight:800;margin:8px 0;">
+                하위권
+            </div>
+            <div style="font-size:14px;color:#42627F;line-height:1.7;">
+                백분위 25% 미만<br>
+                참고 집단에서 비교적 낮은 수치
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with rank2:
+        st.markdown("""
+        <div style="
+            background:#E9F8F1;
+            border:1px solid #B8E6D0;
+            border-radius:15px;
+            padding:18px;
+            min-height:145px;
+        ">
+            <div style="font-size:13px;color:#398267;font-weight:700;">
+                MIDDLE 50%
+            </div>
+            <div style="font-size:23px;color:#267458;font-weight:800;margin:8px 0;">
+                중위권
+            </div>
+            <div style="font-size:14px;color:#426B5C;line-height:1.7;">
+                백분위 25~75% 미만<br>
+                참고 집단의 가운데 범위
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with rank3:
+        st.markdown("""
+        <div style="
+            background:#FFF2E5;
+            border:1px solid #F7D0A9;
+            border-radius:15px;
+            padding:18px;
+            min-height:145px;
+        ">
+            <div style="font-size:13px;color:#B96B2B;font-weight:700;">
+                TOP 25%
+            </div>
+            <div style="font-size:23px;color:#A85C22;font-weight:800;margin:8px 0;">
+                상위권
+            </div>
+            <div style="font-size:14px;color:#8A633F;line-height:1.7;">
+                백분위 75% 이상<br>
+                참고 집단에서 비교적 높은 수치
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="info-note">
+        <b>중요:</b> 여기서 상위권·중위권·하위권은 건강 상태의 등급이 아니라
+        <b>입력한 수치가 참고 집단에서 차지하는 상대적 위치</b>입니다.
+        예를 들어 혈압이 상위권이라는 것은 혈압 수치가 높은 편이라는 의미이지,
+        건강 상태가 좋다는 뜻이 아닙니다. HDL처럼 다른 지표와 해석 방향이 다른 항목도 있습니다.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # --------------------------------------------------
+    # 10. 백분위 그래프
+    # --------------------------------------------------
 
     if chart_rows:
 
-        st.markdown("### 참고 집단 안에서의 상대적 위치")
+        st.markdown("### 📈 지표별 상대적 위치")
 
         chart_df = pd.DataFrame(chart_rows)
 
         fig = px.bar(
             chart_df,
             x="건강 지표",
-            y="백분위 위치",
+            y="백분위",
             range_y=[0, 100],
-            text=chart_df["백분위 위치"].map(
-                lambda x: f"{x:.0f}%"
+            color="분류",
+            color_discrete_map={
+                "하위권": "#438BD0",
+                "중위권": "#43A783",
+                "상위권": "#E9A04B"
+            },
+            text=chart_df["백분위"].map(
+                lambda x: f"{x:.1f}%"
             ),
             labels={
                 "건강 지표": "건강 지표",
-                "백분위 위치": "백분위 위치(%)"
+                "백분위": "백분위(%)",
+                "분류": "수치 상대 위치"
             }
         )
 
         fig.update_traces(
-            marker_color="#6FA38D",
-            textposition="outside"
+            textposition="outside",
+            cliponaxis=False
         )
 
         fig.update_layout(
-            paper_bgcolor="#F5F7F3",
+            paper_bgcolor="#F8FBFF",
             plot_bgcolor="#FFFFFF",
             font=dict(
                 family="Malgun Gothic, sans-serif",
-                color="#40584B"
+                color="#304B63"
             ),
-            margin=dict(l=15, r=15, t=25, b=15),
+            margin=dict(l=15, r=15, t=30, b=15),
             yaxis=dict(
-                gridcolor="#E5ECE5",
-                title="백분위 위치(%)"
+                title="백분위(%)",
+                gridcolor="#E3EDF5",
+                dtick=25
             ),
-            xaxis=dict(title=None)
+            xaxis=dict(title=None),
+            legend_title_text="수치 상대 위치"
         )
 
         st.plotly_chart(
@@ -606,38 +785,43 @@ if submitted:
             use_container_width=True
         )
 
-    # -------------------------------------------------
-    # 10. 지표 설명
-    # -------------------------------------------------
+    # --------------------------------------------------
+    # 11. 각 지표별 설명
+    # --------------------------------------------------
 
-    st.markdown("### 입력한 지표 알아보기")
+    st.markdown("### 💡 결과 이해하기")
 
-    for name in entered_values:
-        with st.expander(name):
+    for row in chart_rows:
+        name = row["건강 지표"]
+        percentile = row["백분위"]
+        category = row["분류"]
+
+        with st.expander(
+            f"{name} · {category} ({percentile:.1f}백분위)"
+        ):
             st.write(VARIABLES[name]["description"])
-
-    st.markdown("### 결과 해석 시 주의할 점")
-
-    st.markdown("""
-    백분위는 입력한 수치가 가상 참고 데이터에서 어느 위치에 있는지 보여줍니다.
-    백분위가 높거나 낮다는 사실만으로 건강 상태가 좋거나 나쁘다고 단정할 수 없습니다.
-
-    특히 HDL 콜레스테롤은 다른 지표와 해석 방향이 다를 수 있습니다.
-    개인의 건강 상태, 측정 조건, 나이 및 다른 검사 결과를 함께 고려해야 합니다.
-    이 결과는 실제 건강검진 통계가 아니며 의료진의 판단을 대신하지 않습니다.
-    """)
+            st.write(
+                f"현재 입력값은 가상 참고 집단의 "
+                f"{percentile:.1f}백분위에 해당합니다."
+            )
+            st.write(VARIABLES[name]["direction"])
+            st.caption(
+                "이 설명은 수치의 상대적 위치에 대한 안내이며 "
+                "개인의 건강 상태를 진단하는 결과가 아닙니다."
+            )
 
 
-# -----------------------------------------------------
-# 11. 하단 안내
-# -----------------------------------------------------
+# ------------------------------------------------------
+# 12. 하단 안내
+# ------------------------------------------------------
 
 st.divider()
 
-st.markdown("### 건강나이 연구소 안내")
+st.markdown("### 🏥 건강나이 연구소")
 
 st.caption("""
-이 프로그램은 교육 및 화면 기능 확인을 위한 시뮬레이션입니다.
-실제 건강 조사 자료나 검증된 생물학적 나이 계산 모델을 사용하지 않습니다.
-건강 상태에 대한 진단과 판단은 의료진과 상담하세요.
+이 프로그램은 화면과 기능을 시험하기 위한 교육용 시뮬레이션입니다.
+가상 데이터를 사용하므로 실제 인구의 건강 통계를 나타내지 않습니다.
+건강 상태에 대한 판단이나 진단은 의료진과 상담하세요.
 """)
+
