@@ -216,7 +216,6 @@ with st.sidebar:
 # GitHub 저장소의 기본 데이터 경로
 DATA_PATH = (
     Path(__file__).parent
-    / "data"
     / "HN24_ALL(SAS).zip"
 )
 
